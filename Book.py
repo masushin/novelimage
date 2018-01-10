@@ -1,25 +1,56 @@
+
+
 class Writer:
     pass
 
-class Book:
+class Cursor:
     def __init__(self):
-        self.text = []
-
-    def addText(self, text):
-        self.text.append(text)
-
-class Page:
-    def __init__(self, param):
-        # self._margin = {"up": margin[0], "bottom": margin[1],
-        #                 "left": margin[2], "right": margin[3]}
-        # self._size = {"w": size[0], "h": size[1]}
         pass
 
+class Page:
+    def __init__(self):
+        pass
+
+class Book:
+    def __init__(self, param):
+        self.text = []
+        self.layout = []
+
+    def addLayout(self, layout):
+        print("Adding layout..")
+        self.layout.append(layout)
+
+    def addText(self, text):
+        print("Adding text..")
+        self.text.append(text)
+
+    def write(self, **param):
+        print("Writing ...")
+        
+
+
+
+
+class Layout:
+    def __init__(self, param):
+        print("Creating Layout : {}".format(param))
+        self.param = param
+        self.columnchain = {}
+
+    def addColumnChain(self, param):
+        self.columnchain[param['name']] = ColumnChain(param)
+
+    def getColumnChain(self, name):
+        return self.columnchain[name]        
+
 class ColumnChain:
-    def __init__(self, name, columns, textattr):
-        self.name = name
-        self.columns = columns
-        self.textattr = textattr
+    def __init__(self, param):
+        print(" Creating ColumnChain : {}".format(param))
+        self.param = param
+        self.column = []
+
+    def addColumn(self, param):
+        self.column.append(Column(param))
 
 class Column:
     # Reference point for constraint
@@ -48,13 +79,9 @@ class Column:
     REFS_LIVEAREA_H = 7
     REFS_LIVEAREA_V = 8
 
-    def __init__(self, refpoint, refline, offsetx, offsety, sizew, sizeh):
-        self.refpoint = refpoint
-        self.refline = {"H": refline[0], "V": refline[1]}
-        self.offset = {"x": {"refs": offsetx[0], "mag": offsetx[1]},
-                       "y": {"refs": offsety[0], "mag": offsety[1]}}
-        self.size = {"w": {"refs": sizew[0], "mag": sizew[1]},
-                     "h": {"refs": sizeh[0], "mag": sizeh[1]}}
+    def __init__(self, param):
+        self.param = param
+        print("  Creating Column : {}".format(param))
 
 
 class TextPart:
@@ -146,6 +173,7 @@ class Text:
         self.source = source
         self.columnchain = columnchain
         self.parts = None
+        self.count = {"part":0, "letter":0}
 
         descriptor = TextDescriptors()
         descriptor.add(RubyTextPart)
@@ -154,9 +182,6 @@ class Text:
         source_text = self.source
         self.parts = descriptor.parse(source_text)
 
-        print(self.columnchain)
-        for part in self.parts:
-            print (part)
 
 class TextAttribute:
     # Direction of writing text

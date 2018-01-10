@@ -11,16 +11,10 @@ class BookParserError(Error):
         self.expression = expression
         self.message = message
 
-def CreatePage(**param):
-    print (param)
-    return Book.Page(param)
-
 def main():
     argument_parser = argparse.ArgumentParser()
     argument_parser.add_argument("infile")
     arguments = argument_parser.parse_args()
-
-    book = Book.Book()
 
     infilePath = Path(arguments.infile).resolve()
     print (infilePath)
@@ -31,15 +25,18 @@ def main():
     root = element_tree.getroot()
 
     if root.tag == "book":
-        print (root.attrib)
-        page = CreatePage(**root.attrib)
+        book = Book.Book(root.attrib)
     else:
         raise BookParserError("Root tag is not <book>.", None)
 
-    for columnchain in root.iter('columnchain'):
-        print (columnchain.attrib)
-        for column in columnchain.iter('column'):
-            print (column.attrib)
+    for layout in root.iter('layout'):
+        booklayout = Book.Layout(layout.attrib)
+        for columnchain in root.iter('columnchain'):
+            booklayout.addColumnChain(columnchain.attrib)
+            for column in columnchain.iter('column'):
+                booklayout.getColumnChain(columnchain.attrib['name']).addColumn(column.attrib)
+
+    book.addLayout(booklayout)
 
     for text in root.iter('text'):
         textPath = Path(text.attrib['src']).resolve()
@@ -51,7 +48,7 @@ def main():
         else:
             print("File not found..")
 
-
+    book.write(file="test")
 
 if __name__ == '__main__':
     main()

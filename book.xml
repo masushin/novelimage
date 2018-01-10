@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<book width="1920" height="960" margin_up="0.1" margin_bottom="0.1" margin_left="0.05" margin_right="0.05">
+
+    <layout name="Main">
+        <columnchain name="Content" fontsize="24" direction="VERTICAL" linespace="2.0" color="#101000">
+            <column refp="UP_RIGHT" reflh="MARGIN_RIGHT" reflv="MARGIN_UP" offsetx="LIVEAREA_H:0" offsety="LIVEAREA_V:0" sizew="LIVEAREA_H:1.0" sizeh="LIVEAREA_V:0.45"/>
+            <column refp="UP_RIGHT" reflh="MARGIN_RIGHT" reflv="MARGIN_UP" offsetx="LIVEAREA_H:0" offsety="LIVEAREA_V:0.55" sizew="LIVEAREA_H:1.0" sizeh="LIVEAREA_V:0.45"/>
+        </columnchain>
+    </layout>
+
+    <text layout="Main" columnchain="Content" src="text.xml" />
+</book>
