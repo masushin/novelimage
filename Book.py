@@ -1,4 +1,4 @@
-
+from PIL import ImageFont, ImageDraw, Image
 
 class Writer:
     pass
@@ -15,6 +15,8 @@ class Book:
     def __init__(self, param):
         self.text = []
         self.layout = []
+        self.param = param
+        print(self.param)
 
     def addLayout(self, layout):
         print("Adding layout..")
@@ -27,9 +29,6 @@ class Book:
     def write(self, **param):
         print("Writing ...")
         
-
-
-
 
 class Layout:
     def __init__(self, param):
@@ -83,105 +82,106 @@ class Column:
         self.param = param
         print("  Creating Column : {}".format(param))
 
-
 class TextPart:
-    name = 'text'
-    start_descriptor = '||'
-    end_descriptor = '|'
-    def __init__(self, source):
-        self.source = source
-        self.text = None
-        self.parse()
-
-    def parse(self):
-        self.text = self.source
+    NAME = "TEXT"
+    def __init__(self):
+        self.content = None
+        self.description = None
 
     def print(self):
-        pass
+        print("{}:{}:{}".format(self.NAME, self.content, self.description))
 
 class PlainTextPart(TextPart):
-    def print(self):
-        print("{}:{}".format(self.name, self.text))
+    NAME = "PLAIN"
+    def __init__(self, source):
+        super().__init__()
+        self.content = source
 
 class RubyTextPart(TextPart):
-    name = 'ruby'
-    start_descriptor = '|r'
+    NAME = "RUBY"
+    def __init__(self, source):
+        super().__init__()
+        self.content, descriptor, self.description = source.partition(':')
 
-    def __init__(self,source):
-        self.ruby = None
-        super().__init__(source)
+class DotTextPart(TextPart):    
+    NAME = "DOT"
+    def __init__(self, source):
+        super().__init__()
+        self.content = source
 
-    def parse(self):
-        text, sep, ruby = self.source.partition(u':')
-        self.text = text
-        self.ruby = ruby
-
-    def print(self):
-        print("{}:{}:{}".format(self.name, self.text, self.ruby))
-
-class DotTextPart(TextPart):
-    name = 'dot'
-    start_descriptor = '|.'
-
-    def print(self):
-        print("{}:{}".format(self.name, self.text))
-
-
-class TextDescriptors:
+class Descriptor:
+    NAME="NONE"
+    START='||'
+    END='|'
     def __init__(self):
-        self.descriptors = []
+        pass
 
-    def add(self, descriptor_class):
-        self.descriptors.append({'key':descriptor_class.name, 'start':descriptor_class.start_descriptor,
-                                 'end':descriptor_class.end_descriptor, 'constractor':descriptor_class})
+    def createPart(self, source):
+        pass
 
-    def get(self, key):
-        for desc in self.descriptors:
-            if key == desc['key']:
-                return desc
+class RubyDescriptor(Descriptor):
+    NAME="RUBY"
+    START='|r'
+    END='|'
+    def __init__(self):
+        super().__init__()
 
-    def find(self, source):
-        ### reutns a descriptor key which is found fisrt, and parts class.
-        pos = {}
-        for desc in self.descriptors:
-            if not source.find(desc['start']) == -1:
-                pos[desc['key']] = source.find(desc['start'])
-        
-        if len(pos) == 0:
-            # みつからない
-            return (None, [PlainTextPart(source)], None)
-        else:
-            key = min(pos)
-            plain, ssep, remain = source.partition(self.get(key)['start'])
-            content, esep, remain = remain.partition(self.get(key)['end'])
-            if plain == "":
-                return (key, [self.get(key)['constractor'](content)], remain)
-            else:
-                return (key, [PlainTextPart(plain) ,self.get(key)['constractor'](content)], remain)
+    def createPart(self,source):
+        return RubyTextPart(source)
+
+class DotDescriptor(Descriptor):
+    NAME="DOT"
+    START='|.'
+    END='|'
+    def __init__(self):
+        super().__init__()
+
+    def createPart(self, source):
+        return DotTextPart(source)
+
+class DescriptionParser:                             
+    def __init__(self):                   
+        self.descriptors = {RubyDescriptor.NAME:RubyDescriptor(),
+                            DotDescriptor.NAME:DotDescriptor()}
 
     def parse(self, source):
-        all_parts = []
+        parts = []
+
         while True:
-            key, parts, source = self.find(source)
-            all_parts += parts
-            if key == None:
+            pos = {}
+            for desc in self.descriptors:
+                desc_pos = source.find(self.descriptors[desc].START)
+                if not desc_pos == -1:
+                    pos[self.descriptors[desc].NAME] = source.find(self.descriptors[desc].START)
+
+            if len(pos) == 0:
+                parts.append(PlainTextPart(source))
                 break
-        return all_parts
+
+            key = min(pos)
+            plaintext, start_descriptor, remain = source.partition(self.descriptors[key].START)
+            content, end_descriptor, remain = remain.partition(self.descriptors[key].END)
+
+            source = remain
+
+            if not plaintext == "":
+                 parts.append(PlainTextPart(plaintext))
+            parts.append(self.descriptors[key].createPart(content))
+
+        return parts
 
 class Text:
     def __init__(self, columnchain, source):
         self.source = source
         self.columnchain = columnchain
         self.parts = None
-        self.count = {"part":0, "letter":0}
+        self.plaintext = None
 
-        descriptor = TextDescriptors()
-        descriptor.add(RubyTextPart)
-        descriptor.add(DotTextPart)
-
+        parser = DescriptionParser()
         source_text = self.source
-        self.parts = descriptor.parse(source_text)
-
+        self.parts = parser.parse(source_text)
+        for part in self.parts:
+            part.print()
 
 class TextAttribute:
     # Direction of writing text
