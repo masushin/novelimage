@@ -34,7 +34,8 @@ class Book:
         print("Writing ...")
         for text in self.text:
             if text.IsRemain():
-                page = Page(size=(self.param["width"],self.param["height"]))
+                page = Page(size=(self.param["width"],self.param["height"]),
+                            layout=self.layout)
                 
             page.image.save("test.png","PNG")
 
