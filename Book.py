@@ -8,7 +8,11 @@ class Cursor:
         pass
 
 class Page:
-    def __init__(self):
+    def __init__(self, size):
+        print (size)
+        self.image = Image.new(mode="RGB", size=(int(size[0]),int(size[1])), color="#ffffff")
+
+    def write(self, text):
         pass
 
 class Book:
@@ -28,7 +32,12 @@ class Book:
 
     def write(self, **param):
         print("Writing ...")
-        
+        for text in self.text:
+            if text.IsRemain():
+                page = Page(size=(self.param["width"],self.param["height"]))
+                
+            page.image.save("test.png","PNG")
+
 
 class Layout:
     def __init__(self, param):
@@ -182,6 +191,12 @@ class Text:
         self.parts = parser.parse(source_text)
         for part in self.parts:
             part.print()
+
+    def IsRemain(self):
+        if self.parts == None:
+            return False
+        else:
+            return True
 
 class TextAttribute:
     # Direction of writing text
