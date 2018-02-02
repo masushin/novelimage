@@ -8,7 +8,7 @@ class Cursor:
         pass
 
 class Page:
-    def __init__(self, size):
+    def __init__(self, size, layout):
         print (size)
         self.image = Image.new(mode="RGB", size=(int(size[0]),int(size[1])), color="#ffffff")
 
