@@ -43,7 +43,7 @@ def main():
         if textPath.exists() == True:
             print("Reading text source..")
             with textPath.open() as file:
-                booktext = Book.Text(text.attrib['columnchain'], file.read())
+                booktext = Book.Text(text.attrib['layout'],text.attrib['columnchain'], file.read())
                 book.addText(booktext)
         else:
             print("File not found..")

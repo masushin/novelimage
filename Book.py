@@ -17,7 +17,6 @@ class Page:
 
 class Book:
     def __init__(self, param):
-        self.text = []
         self.layout = []
         self.param = param
         print(self.param)
@@ -28,16 +27,14 @@ class Book:
 
     def addText(self, text):
         print("Adding text..")
-        self.text.append(text)
+        for layout in self.layout:
+            if layout.param['name'] == text.layout:
+                layout.addText(text)
+                return True
+        return False
 
     def write(self, **param):
         print("Writing ...")
-        for text in self.text:
-            if text.IsRemain():
-                page = Page(size=(self.param["width"],self.param["height"]),
-                            layout=self.layout)
-                
-            page.image.save("test.png","PNG")
 
 
 class Layout:
@@ -52,14 +49,26 @@ class Layout:
     def getColumnChain(self, name):
         return self.columnchain[name]        
 
+    def addText(self, text):
+        for key in self.columnchain:
+            print (key)
+            if self.columnchain[key].param['name'] == text.columnchain:
+                self.columnchain[key].addText(text)
+                return True
+        return False
+
 class ColumnChain:
     def __init__(self, param):
         print(" Creating ColumnChain : {}".format(param))
         self.param = param
+        self.text = None
         self.column = []
 
     def addColumn(self, param):
         self.column.append(Column(param))
+
+    def addText(self, text):
+        self.text = text
 
 class Column:
     # Reference point for constraint
@@ -181,8 +190,9 @@ class DescriptionParser:
         return parts
 
 class Text:
-    def __init__(self, columnchain, source):
+    def __init__(self, layout, columnchain, source):
         self.source = source
+        self.layout = layout
         self.columnchain = columnchain
         self.parts = None
         self.plaintext = None
