@@ -68,6 +68,8 @@ class ColumnChain:
         self.column.append(Column(param))
 
     def addText(self, text):
+        print("Added text to columnchain [{}]".format(self.param['name']))
+        text.print()
         self.text = text
 
 class Column:
@@ -208,6 +210,10 @@ class Text:
             return False
         else:
             return True
+
+    def print(self):
+        for part in self.parts:
+            part.print()
 
 class TextAttribute:
     # Direction of writing text
