@@ -1,0 +1,47 @@
+@startuml
+
+class Page {
+
+}
+
+class Book {
+    + text
+    + layout
+    + param
+    + addLayout()
+    + addText()
+}
+
+class Layout {
+    + param
+    + columnchain
+    + addColumnChain()
+    + getColumnChain()
+}
+
+class ColumnChain {
+    + param
+    + column
+    + addColumn()
+}
+
+class Column {
+    + param
+}
+
+class Text {
+    + source
+    + columnchain
+    + parts
+    + plaintext
+    + IsRemain()
+}
+
+Book *-- Text
+Book *-- Layout
+Book *-- Page
+Layout *-- ColumnChain
+ColumnChain *-- Column
+
+
+@enduml
